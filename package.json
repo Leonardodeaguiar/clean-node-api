@@ -6,7 +6,7 @@
   "author": "lenrd <leonardo_aguiar@live.co.kr>",
   "license": "MIT",
   "scripts": {
-    "test": "test"
+    "test": "jest"
   },
   "lint-staged": {
     "*.js": [
