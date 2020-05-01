@@ -4,5 +4,24 @@
   "main": "index.js",
   "repository": "https://github.com/Lenrd/clean-node-api.git",
   "author": "lenrd <leonardo_aguiar@live.co.kr>",
-  "license": "MIT"
+  "license": "MIT",
+  "scripts": {
+    "test": "test"
+  },
+  "lint-staged": {
+    "*.js": [
+      "standard --fix",
+      "git add"
+    ]
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "devDependencies": {
+    "jest": "^25.5.3",
+    "lint-staged": "^10.2.2",
+    "standard": "^14.3.3"
+  }
 }
