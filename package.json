@@ -6,13 +6,11 @@
   "author": "lenrd <leonardo_aguiar@live.co.kr>",
   "license": "MIT",
   "scripts": {
-    "test": "jest"
+    "test": "jest --watchAll",
+    "test:staged": "jest"
   },
   "lint-staged": {
-    "*.js": [
-      "standard --fix",
-      "git add"
-    ]
+    "*.js": ["standard --fix", "npm run test:staged", "git add"]
   },
   "husky": {
     "hooks": {
