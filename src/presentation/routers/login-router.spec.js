@@ -1,5 +1,6 @@
 const LoginRouter = require('./login-router')
 const MissingParamError = require('../helpers/missingParamError')
+const UnauthorizedError = require('../helpers/UnauthorizedError')
 
 const makeSut = () => {
   class AuthUseCaseSpy {
@@ -64,14 +65,17 @@ describe('Login Router', () => {
     expect(authUseCaseSpy.password).toBe(httpRequest.body.password)
   })
   test('Should return 401 unauthorized when invalid params are provided', () => {
-    const { sut, authUseCaseSpy } = makeSut()
+    const { sut } = makeSut()
     const httpRequest = {
       body: {
         email: 'wrong_rito@gomes.com',
         password: "wrong_where's my valorant key rito"
       }
     }
+    // 401: usuario desconhecido
+    // 403: quando o usuario é encontrado mas não tem permissao de uso
     const httpResponse = sut.route(httpRequest)
     expect(httpResponse.statusCode).toBe(401)
+    expect(httpResponse.body).toEqual(new UnauthorizedError())
   })
 })

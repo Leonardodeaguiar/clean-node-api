@@ -1,4 +1,5 @@
 const MissingParamError = require('./missingParamError')
+const UnauthorizedError = require('./unauthorizedError')
 module.exports = class httpResponse {
   static badRequest (paramName) {
     return {
@@ -8,5 +9,11 @@ module.exports = class httpResponse {
   }
   static serverError () {
     return { statusCode: 500 }
+  }
+  static unauthorizedError () {
+    return {
+      statusCode: 401,
+      body: new UnauthorizedError()
+    }
   }
 }
