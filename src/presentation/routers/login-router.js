@@ -1,11 +1,16 @@
 const httpResponse = require('../helpers/http-response')
 const MissingParamError = require('../helpers/missingParamError')
 module.exports = class LoginRouter {
-  constructor (authUseCaseSpy) {
-    this.authUseCaseSpy = authUseCaseSpy
+  constructor (authUseCase) {
+    this.authUseCase = authUseCase
   }
   route (httpRequest) {
-    if (!httpRequest || !httpRequest.body) {
+    if (
+      !httpRequest ||
+      !httpRequest.body ||
+      !this.authUseCase ||
+      !this.authUseCase.auth
+    ) {
       return httpResponse.serverError()
     }
     const { email, password } = httpRequest.body
@@ -16,7 +21,7 @@ module.exports = class LoginRouter {
     if (!password) {
       return httpResponse.badRequest(new MissingParamError('password'))
     }
-    this.authUseCaseSpy.auth(email, password)
+    this.authUseCase.auth(email, password)
     return httpResponse.unauthorizedError()
   }
 }
