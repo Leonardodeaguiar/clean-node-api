@@ -2,6 +2,7 @@ const LoginRouter = require('./login-router')
 const MissingParamError = require('../helpers/missingParamError')
 const InvalidParamError = require('../helpers/invalidParamError')
 const UnauthorizedError = require('../helpers/unauthorizedError')
+const ServerError = require('../helpers/serverError')
 
 const makeSut = () => {
   const authUseCaseSpy = makeAuthUseCase()
@@ -130,6 +131,7 @@ describe('Login Router', () => {
     }
     const httpResponse = await sut.route(httpRequest)
     expect(httpResponse.statusCode).toBe(500)
+    expect(httpResponse.body).toEqual(new ServerError())
   })
   test('Should return 500 if authUseCase has no auth method', async () => {
     const authUseCaseSpy = makeAuthUseCaseWithError()
@@ -168,4 +170,17 @@ describe('Login Router', () => {
     expect(httpResponse.statusCode).toBe(400)
     expect(httpResponse.body).toEqual(new InvalidParamError('email'))
   })
+})
+test('Should return 500 if emailValidator has no isValid method', async () => {
+  const authUseCaseSpy = makeAuthUseCase()
+  const sut = new LoginRouter(authUseCaseSpy)
+  const httpRequest = {
+    body: {
+      email: 'any_mail@gomes.com',
+      password: 'any_password'
+    }
+  }
+  const httpResponse = await sut.route(httpRequest)
+  expect(httpResponse.statusCode).toBe(500)
+  expect(httpResponse.body).toEqual(new ServerError())
 })
