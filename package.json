@@ -7,7 +7,7 @@
   "license": "MIT",
   "scripts": {
     "test": "jest --watchAll",
-    "test:staged": "jest"
+    "test:staged": "jest --passWithNoTests"
   },
   "lint-staged": {
     "*.js": ["npm run test:staged"]
