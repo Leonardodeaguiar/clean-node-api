@@ -25,7 +25,8 @@ module.exports = class LoginRouter {
       }
       return httpResponse.success({ accessToken })
     } catch (error) {
-      //console.error(error)
+      //silent no jest oculta os console error
+      console.error(error)
       return httpResponse.serverError()
     }
   }

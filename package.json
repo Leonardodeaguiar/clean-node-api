@@ -6,8 +6,8 @@
   "author": "lenrd <leonardo_aguiar@live.co.kr>",
   "license": "MIT",
   "scripts": {
-    "test": "jest --watchAll",
-    "test:staged": "jest --passWithNoTests"
+    "test": "jest --watch --silent --verbose",
+    "test:staged": "jest --passWithNoTests --findRelatedTests --silent"
   },
   "lint-staged": {
     "*.js": ["npm run test:staged"]
