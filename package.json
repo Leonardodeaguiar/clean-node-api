@@ -17,13 +17,8 @@
       "npm run test:staged"
     ]
   },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged",
-      "pre-push": "npm run test:ci"
-    }
-  },
   "devDependencies": {
+    "husky": "^4.2.5",
     "jest": "^25.5.3",
     "lint-staged": "^10.2.2",
     "standard": "^14.3.3"
