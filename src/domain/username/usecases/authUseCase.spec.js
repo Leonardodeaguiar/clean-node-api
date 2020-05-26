@@ -2,18 +2,32 @@ const { MissingParamError } = require('../../../utils/errors')
 const AuthUseCase = require('./authUseCase')
 
 const makeSut = () => {
+  class EncrypterSpy {
+    async compare (password, hashedPassword) {
+      this.password = password
+      this.hashedPassword = hashedPassword
+    }
+  }
+  const encrypterSpy = new EncrypterSpy()
   class LoadUserByEmailRepositorySpy {
     async load (email) {
       this.email = email
+      return this.user
     }
   }
   const loadUserByEmailRepositorySpy = new LoadUserByEmailRepositorySpy()
-  const sut = new AuthUseCase(loadUserByEmailRepositorySpy)
+  loadUserByEmailRepositorySpy.user = {
+    password: 'hashedPassword'
+  }
+
+  const sut = new AuthUseCase(loadUserByEmailRepositorySpy, encrypterSpy)
   return {
     sut,
-    loadUserByEmailRepositorySpy
+    loadUserByEmailRepositorySpy,
+    encrypterSpy
   }
 }
+
 describe('Auth UseCase', () => {
   test('Should Throw if no email is provided', async () => {
     const { sut } = makeSut()
@@ -33,22 +47,24 @@ describe('Auth UseCase', () => {
   test('Should throw if no LoadUserByEmailRepository is provided', async () => {
     const sut = new AuthUseCase()
     const promise = sut.auth('any_email@mail.com', 'any_password')
-
-    expect(promise).rejects.toThrow(
-      new MissingParamError('loadUserByEmailRepository')
-    )
+    expect(promise).rejects.toThrow()
   })
   test('Should throw if no LoadUserByEmailRepository has no load provided', async () => {
     const sut = new AuthUseCase({})
     const promise = sut.auth('any_email@mail.com', 'any_password')
-
     expect(promise).rejects.toThrow()
   })
   test('Should return null if LoadUserByEmailRepository returns null', async () => {
     const { sut } = makeSut()
-
     const accessToken = await sut.auth('Invalid_email@mail.com', 'any_password')
-
     expect(accessToken).toBeNull()
+  })
+  test('Should call Encrypter with correct values', async () => {
+    const { sut, loadUserByEmailRepositorySpy, encrypterSpy } = makeSut()
+    await sut.auth('valid_email@mail.com', 'any_password')
+    expect(encrypterSpy.password).toBe('any_password')
+    expect(encrypterSpy.hashedPassword).toBe(
+      loadUserByEmailRepositorySpy.user.password
+    )
   })
 })
