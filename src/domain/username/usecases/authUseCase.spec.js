@@ -86,7 +86,6 @@ describe('Auth UseCase', () => {
   test('Should return null if LoadUserByEmailRepository returns null', async () => {
     const { sut } = makeSut()
     const accessToken = null
-
     expect(accessToken).toBeNull()
   })
   test('Should return null if an invalid email is provided', async () => {
