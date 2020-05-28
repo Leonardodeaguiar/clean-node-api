@@ -13,6 +13,17 @@ const makeEncrypter = () => {
   encrypterSpy.isValid = true
   return encrypterSpy
 }
+const makeTokenGenerator = () => {
+  class TokenGeneratorSpy {
+    async generate (userId) {
+      this.userId = userId
+      return this.accessToken
+    }
+  }
+  const tokenGeneratorSpy = new TokenGeneratorSpy()
+  tokenGeneratorSpy.accessToken = 'Any_token'
+  return tokenGeneratorSpy
+}
 
 const makeLoadUserByEmailRepository = () => {
   class LoadUserByEmailRepositorySpy {
@@ -23,6 +34,7 @@ const makeLoadUserByEmailRepository = () => {
   }
   const loadUserByEmailRepositorySpy = new LoadUserByEmailRepositorySpy()
   loadUserByEmailRepositorySpy.user = {
+    id: 'any_id',
     password: 'hashedPassword'
   }
   return loadUserByEmailRepositorySpy
@@ -31,11 +43,17 @@ const makeLoadUserByEmailRepository = () => {
 const makeSut = () => {
   const encrypterSpy = makeEncrypter()
   const loadUserByEmailRepositorySpy = makeLoadUserByEmailRepository()
-  const sut = new AuthUseCase(loadUserByEmailRepositorySpy, encrypterSpy)
+  const tokenGeneratorSpy = makeTokenGenerator()
+  const sut = new AuthUseCase(
+    loadUserByEmailRepositorySpy,
+    encrypterSpy,
+    tokenGeneratorSpy
+  )
   return {
     sut,
     loadUserByEmailRepositorySpy,
-    encrypterSpy
+    encrypterSpy,
+    tokenGeneratorSpy
   }
 }
 
@@ -67,6 +85,7 @@ describe('Auth UseCase', () => {
   })
   test('Should return null if LoadUserByEmailRepository returns null', async () => {
     const { sut } = makeSut()
+
     const accessToken = await sut.auth('Invalid_email@mail.com', 'any_password')
     expect(accessToken).toBeNull()
   })
@@ -92,5 +111,10 @@ describe('Auth UseCase', () => {
     expect(encrypterSpy.hashedPassword).toBe(
       loadUserByEmailRepositorySpy.user.password
     )
+  })
+  test('Should call TokenGenerator with correct userId', async () => {
+    const { sut, loadUserByEmailRepositorySpy, tokenGeneratorSpy } = makeSut()
+    await sut.auth('valid_email@mail.com', 'any_password')
+    expect(tokenGeneratorSpy.userId).toBe(loadUserByEmailRepositorySpy.user.id)
   })
 })
