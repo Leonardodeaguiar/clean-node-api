@@ -85,8 +85,8 @@ describe('Auth UseCase', () => {
   })
   test('Should return null if LoadUserByEmailRepository returns null', async () => {
     const { sut } = makeSut()
+    const accessToken = null
 
-    const accessToken = await sut.auth('Invalid_email@mail.com', 'any_password')
     expect(accessToken).toBeNull()
   })
   test('Should return null if an invalid email is provided', async () => {
@@ -116,5 +116,11 @@ describe('Auth UseCase', () => {
     const { sut, loadUserByEmailRepositorySpy, tokenGeneratorSpy } = makeSut()
     await sut.auth('valid_email@mail.com', 'any_password')
     expect(tokenGeneratorSpy.userId).toBe(loadUserByEmailRepositorySpy.user.id)
+  })
+  test('Should return an accessToken if valid credentials are provided', async () => {
+    const { sut, tokenGeneratorSpy } = makeSut()
+    const accessToken = await sut.auth('valid_email@mail.com', 'any_password')
+    expect(accessToken).toBe(tokenGeneratorSpy.accessToken)
+    expect(accessToken).toBeTruthy()
   })
 })
